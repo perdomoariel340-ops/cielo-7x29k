@@ -540,7 +540,7 @@ button{background:linear-gradient(120deg,#e8dce9,#b9a9c8);color:#17131b}
 <section class="room-content" id="cartaella">
 <button class="back-button" onclick="backHome()" type="button">← Volver a las habitaciones</button>
 <h2>Libro de visitas 📒</h2>
-<p class="muted">Escribe aquí lo que quieras decirme. Cada mensaje se queda guardado con su fecha.</p>
+<p class="muted">Escribe aquí lo que quieras decirme. Cada mensaje se queda guardado con su fecha.</p><p class="muted" style="text-align:center">Lo que escribas aquí también le llega a tu amor 💌</p>
 <div class="up21-box"><textarea id="gbInput" maxlength="900" placeholder="Escribe tu mensaje..."></textarea><div class="up21-row"><button type="button" onclick="gbAdd()">Dejar mensaje</button><button type="button" class="up21-wa" onclick="gbSend()">Enviárselo a mi amor 💌</button></div><div id="gbList" class="up21-list"></div></div>
 </section>
 <section class="room-content" id="medallas">
@@ -561,7 +561,7 @@ button{background:linear-gradient(120deg,#e8dce9,#b9a9c8);color:#17131b}
 <section class="room-content" id="suenos">
 <button class="back-button" onclick="backHome()" type="button">← Volver a las habitaciones</button>
 <h2>Lista de sueños juntos 🌠</h2>
-<p class="muted">Agrega todo lo que sueñas hacer conmigo. Toca un sueño para tacharlo cuando se cumpla.</p>
+<p class="muted">Agrega todo lo que sueñas hacer conmigo. Toca un sueño para tacharlo cuando se cumpla.</p><p class="muted" style="text-align:center">Lo que escribas aquí también le llega a tu amor 💌</p>
 <div class="up21-box"><div class="up21-row"><input id="dreamInput" maxlength="140" placeholder="Un sueño o plan juntos..." onkeydown="if(event.key==='Enter')dreamAdd()"><button type="button" onclick="dreamAdd()">Agregar</button></div><div id="dreamList" class="up21-list"></div><button type="button" class="up21-wa" onclick="dreamSend()">Enviarle mi lista a mi amor 💌</button></div>
 </section>
 <section class="room-content" id="tesoro21">
@@ -579,7 +579,7 @@ button{background:linear-gradient(120deg,#e8dce9,#b9a9c8);color:#17131b}
 <section class="room-content" id="deseo">
 <button class="back-button" onclick="backHome()" type="button">← Volver a las habitaciones</button>
 <h2>Pide un deseo 🌟</h2>
-<p class="muted">Escribe tu deseo, toca la estrella y mándalo al cielo.</p>
+<p class="muted">Escribe tu deseo, toca la estrella y mándalo al cielo.</p><p class="muted" style="text-align:center">Lo que escribas aquí también le llega a tu amor 💌</p>
 <div class="up21-box"><div id="wishStar" class="up21-star">🌠</div><textarea id="wishInput" maxlength="400" placeholder="Mi deseo es..."></textarea><div class="up21-row"><button type="button" onclick="wishMake()">Pedir deseo ✨</button><button type="button" class="up21-wa" onclick="wishSend()">Contárselo a mi amor 💌</button></div><p id="wishMsg" class="muted" style="text-align:center"></p><div id="wishList" class="up21-list"></div></div>
 </section>
 <footer>Hecho con cariño, pensando en ti. Nuestro pequeño universo 🖤🌙</footer>
@@ -1694,25 +1694,26 @@ const $=id=>document.getElementById(id);
 const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(_){return d}};
 const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}};
 const esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function send(tipo,msg){try{fetch('https://formspree.io/f/mgakpnwe',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({_subject:'Universo - '+tipo,tipo:tipo,mensaje:msg,fecha:new Date().toLocaleString('es-CO')})}).catch(function(){})}catch(_){}}
 function toast(m){let t=$('up21Toast');if(!t){t=document.createElement('div');t.id='up21Toast';document.body.appendChild(t)}t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',3800)}
 function wa(text){window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(text.slice(0,3500)),'_blank')}
 const fecha=()=>new Date().toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});
 
 /* Libro de visitas */
 function gbRender(){const l=load('up21.visitas',[]);$('gbList').innerHTML=l.slice().reverse().map(e=>'<div class="up21-item"><div class="t" style="cursor:default"><small>'+esc(e.d)+'</small>'+esc(e.t)+'</div></div>').join('')||'<p class="muted" style="text-align:center">Aún no hay mensajes. Escribe el primero 🖤</p>'}
-window.gbAdd=function(){const i=$('gbInput');const t=i.value.trim();if(!t)return;const l=load('up21.visitas',[]);l.push({d:fecha(),t});save('up21.visitas',l);i.value='';gbRender();toast('Mensaje guardado 📒')}
+window.gbAdd=function(){const i=$('gbInput');const t=i.value.trim();if(!t)return;const l=load('up21.visitas',[]);l.push({d:fecha(),t});save('up21.visitas',l);send('Libro de visitas',t);i.value='';gbRender();toast('Mensaje guardado 📒')}
 window.gbSend=function(){const l=load('up21.visitas',[]);const t=$('gbInput').value.trim();const parts=[];if(t)parts.push(t);else l.slice(-3).forEach(e=>parts.push(e.t));if(!parts.length){toast('Escribe algo primero 💌');return}wa('📒 Del libro de visitas:\n\n'+parts.join('\n\n'))}
 
 /* Lista de sueños */
 function dreamRender(){const l=load('up21.suenos',[]);$('dreamList').innerHTML=l.map((e,i)=>'<div class="up21-item'+(e.done?' done':'')+'"><span class="t" onclick="dreamToggle('+i+')">'+(e.done?'✅ ':'⭐ ')+esc(e.t)+'</span><button class="x" type="button" onclick="dreamDel('+i+')">✕</button></div>').join('')||'<p class="muted" style="text-align:center">Todavía no hay sueños. Agrega el primero 🌠</p>'}
-window.dreamAdd=function(){const i=$('dreamInput');const t=i.value.trim();if(!t)return;const l=load('up21.suenos',[]);l.push({t,done:false});save('up21.suenos',l);i.value='';dreamRender()}
-window.dreamToggle=function(i){const l=load('up21.suenos',[]);if(l[i]){l[i].done=!l[i].done;save('up21.suenos',l);dreamRender()}}
+window.dreamAdd=function(){const i=$('dreamInput');const t=i.value.trim();if(!t)return;const l=load('up21.suenos',[]);l.push({t,done:false});save('up21.suenos',l);send('Nuevo sueño',t);i.value='';dreamRender()}
+window.dreamToggle=function(i){const l=load('up21.suenos',[]);if(l[i]){l[i].done=!l[i].done;save('up21.suenos',l);if(l[i].done)send('Sueño cumplido',l[i].t);dreamRender()}}
 window.dreamDel=function(i){const l=load('up21.suenos',[]);l.splice(i,1);save('up21.suenos',l);dreamRender()}
 window.dreamSend=function(){const l=load('up21.suenos',[]);if(!l.length){toast('Agrega al menos un sueño 🌠');return}wa('🌠 Nuestra lista de sueños:\n\n'+l.map(e=>(e.done?'✅ ':'⭐ ')+e.t).join('\n'))}
 
 /* Deseos + easter eggs */
 function wishRender(){const l=load('up21.deseos',[]);$('wishList').innerHTML=l.slice().reverse().map(e=>'<div class="up21-item"><div class="t" style="cursor:default"><small>'+esc(e.d)+'</small>🌟 '+esc(e.t)+'</div></div>').join('')}
-window.wishMake=function(){const i=$('wishInput');const t=i.value.trim();if(!t)return;const star=$('wishStar');star.classList.add('fly');setTimeout(()=>star.classList.remove('fly'),1500);const l=load('up21.deseos',[]);l.push({d:fecha(),t});save('up21.deseos',l);i.value='';wishRender();
+window.wishMake=function(){const i=$('wishInput');const t=i.value.trim();if(!t)return;const star=$('wishStar');star.classList.add('fly');setTimeout(()=>star.classList.remove('fly'),1500);const l=load('up21.deseos',[]);l.push({d:fecha(),t});save('up21.deseos',l);send('Deseo',t);i.value='';wishRender();
  const w=t.toLowerCase();let m='Tu deseo viajó hasta las estrellas ✨';
  if(/\bsiempre\b/.test(w))m='🌌 Palabra secreta encontrada: contigo, siempre. Y eso ya es un deseo cumplido 🖤';
  else if(/\buniverso\b/.test(w))m='🪐 Palabra secreta: tú eres el centro de este universo 🖤';
